@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phishing Website Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #141e30, #243b55);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #1f2933;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #38bdf8;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #38bdf8;
+            border: none;
+            color: #000;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .safe {
+            color: #22c55e;
+        }
+
+        .phishing {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔐 Phishing Detection</h1>
+    <input type="text" id="urlInput" placeholder="Enter website URL">
+    <button onclick="checkURL()">Check Website</button>
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    function checkURL() {
+        const url = document.getElementById("urlInput").value;
+        const resultDiv = document.getElementById("result");
+
+        if (url.trim() === "") {
+            resultDiv.innerHTML = "⚠️ Please enter a URL";
+            return;
+        }
+
+        fetch("http://127.0.0.1:5000/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ url: url })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.prediction.includes("Legitimate")) {
+                resultDiv.innerHTML = data.prediction;
+                resultDiv.className = "result safe";
+            } else {
+                resultDiv.innerHTML = data.prediction;
+                resultDiv.className = "result phishing";
+            }
+        })
+        .catch(error => {
+            resultDiv.innerHTML = "❌ Server not running";
+            console.error(error);
+        });
+    }
+</script>
+
+</body>
+</html>
